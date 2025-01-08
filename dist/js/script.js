@@ -174,10 +174,10 @@ window.addEventListener('DOMContentLoaded', function () {
   //Forms
 
   const forms = document.querySelectorAll('form');
-  const massage = {
-    loading: 'Завантаження',
-    success: 'Дякую, скоро ми з Вами звяжемось',
-    failer: 'Щось пішло не так'
+  const message = {
+    loading: 'Загрузка...',
+    success: 'Спасибо! Скоро мы с вами свяжемся',
+    failure: 'Что-то пошло не так...'
   };
   forms.forEach(item => {
     postData(item);
@@ -185,21 +185,30 @@ window.addEventListener('DOMContentLoaded', function () {
   function postData(form) {
     form.addEventListener('submit', e => {
       e.preventDefault();
-      const statusMessage = document.createElement('div');
+      let statusMessage = document.createElement('div');
       statusMessage.classList.add('status');
-      statusMessage.textContent = massage.loading;
-      form.append(statusMessage);
+      statusMessage.textContent = message.loading;
+      form.appendChild(statusMessage);
       const request = new XMLHttpRequest();
       request.open('POST', 'server.php');
-      request.setRequestHeader('Content-type', 'multipart/form-data');
+      request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
       const formData = new FormData(form);
-      request.send(formData);
+      const object = {};
+      formData.forEach(function (value, key) {
+        object[key] = value;
+      });
+      const json = JSON.stringify(object);
+      request.send(json);
       request.addEventListener('load', () => {
         if (request.status === 200) {
           console.log(request.response);
-          statusMessage.textContent = massage.success;
+          statusMessage.textContent = message.success;
+          form.reset();
+          setTimeout(() => {
+            statusMessage.remove();
+          }, 2000);
         } else {
-          statusMessage.textContent = massage.failer;
+          statusMessage.textContent = message.failure;
         }
       });
     });

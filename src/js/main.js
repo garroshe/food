@@ -221,53 +221,48 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
     const forms = document.querySelectorAll('form');
-
-    const massage = {
-        loading : 'Завантаження',
-        success : 'Дякую, скоро ми з Вами звяжемось',
-        failer : 'Щось пішло не так'
+    const message = {
+        loading: 'Загрузка...',
+        success: 'Спасибо! Скоро мы с вами свяжемся',
+        failure: 'Что-то пошло не так...'
     };
 
     forms.forEach(item => {
         postData(item);
     });
 
-    function postData(form){
-        form.addEventListener('submit', (e)=> {
+    function postData(form) {
+        form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const statusMessage = document.createElement('div');
+            let statusMessage = document.createElement('div');
             statusMessage.classList.add('status');
-            statusMessage.textContent = massage.loading;
-            form.append(statusMessage);
-
+            statusMessage.textContent = message.loading;
+            form.appendChild(statusMessage);
+        
             const request = new XMLHttpRequest();
-
             request.open('POST', 'server.php');
-
-            
-            request.setRequestHeader('Content-type', 'application/json');
+            request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             const formData = new FormData(form);
 
             const object = {};
-            formData.forEach((value, key)=> {
+            formData.forEach(function(value, key){
                 object[key] = value;
             });
-
-            const json = JSON.stringify(object)
+            const json = JSON.stringify(object);
 
             request.send(json);
 
-            request.addEventListener('load', ()=> {
-                if(request.status === 200) {
+            request.addEventListener('load', () => {
+                if (request.status === 200) {
                     console.log(request.response);
-                    statusMessage.textContent = massage.success;
+                    statusMessage.textContent = message.success;
                     form.reset();
-                    setTimeout(()=> {
+                    setTimeout(() => {
                         statusMessage.remove();
                     }, 2000);
                 } else {
-                    statusMessage.textContent = massage.failer;
+                    statusMessage.textContent = message.failure;
                 }
             });
         });
